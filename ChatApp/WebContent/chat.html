@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html ng-app="chatApp">
+<head>
+<meta charset="UTF-8">
+<script src="js/jquery-1.11.0.js"></script>
+<script src="lib/angular.js"></script>
+<script src="js/chat.js"></script>
+<title>Best chat app</title>
+<style>
+body {
+    background-image: url(pic/background.jpg);
+    background-position: center top;
+    background-size: 100%;
+    overflow: hidden
+   
+}
+
+.scrollit {
+    overflow: auto;
+    height:100px;
+}
+
+.messagesTables {
+	border-radius:6px;
+}
+
+
+</style>
+</head>
+<body >
+<div style="margin-left: 10%; margin-right: 10%" ng-controller="chatPart" ng-init="openSocket()">
+<font color="white" face="arial">
+<h2 style="float: right"><a href="" ng-click="logout()">>Logout</a></h2>
+<h2>Chat</h2>
+
+<p>Logged user: {{logged}}</p>
+
+</font>
+<font face="arial">
+<div style="background: white; width: 100%;" align="center">Chatting with: {{receiver}}</div>
+<table style="width: 100%; max-height:500px; height: 500px;">
+	<tr>
+		<td style="width: 30%; height: 100% " bgcolor="white">
+			<div class="scrollit" style="height: 100%; max-width: 350px;">
+				<table style="width: 100%; border: none;" cellspacing="0" cellpadding="0">
+					<tr class="usersTables" id="all" style="cursor: pointer;  width: 100%" ng-click="selectedUser('all')">
+						<td style="width:50px;"><img src="pic/profile_group.png" width="50px" height="50px"></td>
+						<td>&nbsp;&nbsp;&nbsp;All</td>
+					</tr>						
+				</table>
+				<table>
+					<tr>
+						<td>Active</td>
+					</tr>
+				</table>
+				<table style="width: 100%; border: none;" ng-repeat="user in activeUsers"  cellspacing="0" cellpadding="0">
+					<tr class="usersTables" id="{{ user.username }}" style="cursor: pointer;  width: 100%" ng-if="user.username!=logged"  ng-click="selectedUser(user.username)">
+						<td style="width: 50px"><img src="pic/profile_single.png" height="50px"></td>
+						<td>&nbsp;&nbsp;&nbsp;{{user.username}}</td>
+					</tr>						
+				</table>
+				<table>
+					<tr>
+						<td>Offline</td>
+					</tr>
+				</table>
+				<table style="width: 100%; border: none;" ng-repeat="user in offlineUsers" cellspacing="0" cellpadding="0">
+					<tr class="usersTables" id="{{ user.username }}"  style="cursor: pointer; padding: 10px; width: 100%" ng-if="user.username!=logged" ng-click="selectedUser(user.username)">
+						<td style="width: 50px"><img src="pic/profile_single.png" height="50px"></td>
+						<td>&nbsp;&nbsp;&nbsp;{{user.username}}</td>
+					</tr>						
+				</table>
+			</div>
+		</td>
+		<td style="width: 70%; height: 100%">
+			<div class="scrollit" style="height: 100%; width: 100%" id="scroller">
+			<table style="width: 100%; height: 100%" bgcolor="white" border=1>
+				<tr style="width: 80%; height: 100%" >
+					<td colspan="2" valign="bottom">
+						<div style="width:100%" ng-repeat="message in messages">
+							<table ng-if="message.from.username!=logged" style=" width: 100%; text-align: left" >
+								<tr>
+									<td style="border: none;" width="20px" height="20px"><img src="pic/profile_single.png" height="20px"></td>
+									<td style="border: none;">
+										<table style="table-layout:fixed; width: 100%; background-color: #66b3ff;" class="messagesTables">
+											<tr>
+												<td>Sent by: {{message.from.username}}</td>
+												<td align="right">{{getDate(message.date)}}</td>
+											</tr>	
+											<tr>
+												<td style="word-wrap: break-word" colspan=2><b>{{message.subject}}</b></td>
+											</tr>
+											<tr>
+												<td style="word-wrap: break-word" colspan=2>{{message.content}}</td>
+											</tr>
+										</table>
+									</td>
+								</tr>	
+				
+							</table>
+							<table ng-if="message.from.username==logged" style=" width: 100%; text-align: right" >
+								<tr>
+									<td style="border: none;">
+										<table style="table-layout:fixed; width: 100%; background-color: #80ff80" class="messagesTables">
+											<tr>
+												<td align="left">{{getDate(message.date)}}</td>
+												<td>Sent by: {{message.from.username}}</td>
+											</tr>
+											<tr>
+												<td style="word-wrap: break-word" colspan=2><b>{{message.subject}}</b></td>
+											</tr>
+											<tr>
+												<td style="word-wrap: break-word" colspan=2>{{message.content}}</td>
+											</tr>
+										</table>
+									</td>
+									<td style="border: none;" width="20px" height="20px"><img src="pic/profile_single.png" height="20px"></td>
+								</tr>						
+							</table>	
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td style="border: none">
+						<input placeholder="Subject..." style="width: 100%" type="text" id="subjectinput"/>
+					</td>
+					<td style="width: 10%; height: 100%; border: none">
+						<button style="width: 100%" type="button" id="send" ng-click="send()" >Send</button>
+					</td>
+				</tr>
+				<tr>
+					<td style="border: none">
+						<textarea placeholder="Content..." style="width: 100%" rows="3" id="contentinput"></textarea>
+					</td>
+					
+				</tr>
+			</table>
+			</div>
+		</td>
+	</tr>
+</table>
+
+<br />
+<div style="visibility: hidden;">
+	<br>
+	<input type="text" id="tekst" />
+	<button id="send" >Send</button>
+	<br />
+	<div >
+	    <input type="text" id="messageinput1"/>
+	</div>
+	
+	<div>
+	    <button type="button" ng-click="openSocket()" >Open</button>
+	    <button type="button" ng-click="send()" >Send</button>
+	    <button type="button" ng-click="closeSocket()" >Close</button>
+	</div>
+	
+	<div id="messages"></div>
+	</div>
+</font>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html ng-app="chatApp">
+<head>
+<meta charset="UTF-8">
+<title>Register</title>
+<script src="js/jquery-1.11.0.js"></script>
+<script src="lib/angular.js"></script>
+<script src="js/register.js"></script>
+</head>
+<body>
+
+<div ng-controller="registerPart" ng-init="openSocket()">
+
+Username:<br>
+<input type="text"id="username" ng-model="user.username"><br>
+Password:<br>
+<input type="password" id="password" ng-model="user.password">
+<br><br>
+<button ng-click="send()">Register</button>
+<a href="index.html">Login</a>
+</div>
+ 
+</html>

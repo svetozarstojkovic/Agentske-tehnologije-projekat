@@ -1,0 +1,8 @@
+1. copy this into standalone-full-ha.xml
+
+	<jms-topic name="topic/informTopic">
+		<entry name="java:/jms/topic/informTopic"/>
+	</jms-topic>
+	<jms-topic name="topic/mojTopic">                       
+		<entry name="java:jboss/exported/jms/topic/mojTopic"/>                  
+	</jms-topic>
